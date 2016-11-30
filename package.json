@@ -6,6 +6,8 @@
   "repository": "",
   "author": "Zachary Bennett zbennett10@hotmail.com",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "~3.2.4",
+    "pug": "2.0.0-beta6"
   }
 }
