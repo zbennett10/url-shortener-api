@@ -1,0 +1,11 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "A url-shortener microservice",
+  "main": "server.js",
+  "repository": "",
+  "author": "Zachary Bennett zbennett10@hotmail.com",
+  "dependencies": {
+    "express": "~3.2.4",
+  }
+}
