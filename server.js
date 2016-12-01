@@ -3,6 +3,7 @@ var http = require('http');
 var path = require('path');
 var bodyParser = require('body-parser');
 var mongo = require('mongodb');
+var assert = require('assert');
 
 
 //----------------------------Configuration
@@ -16,13 +17,6 @@ router.set('views', path.join(__dirname, 'views'));
 
 //-------------------------Database Stuff
 var url = `mongodb://${process.env.IP}:27017/local`;
-/*MongoClient.connect(url, function(err, db) {
-    if(err) console.log("Didn't work:", err);
-    else{
-    console.log("It worked!");
-    db.close();
-    }
-});*/
 
 
 //------------------------------Middleware
@@ -37,21 +31,45 @@ router.get(('/'),function(req,res) {
 });
 
 
-
-
-router.get('/:input', function(req, res){
+router.get('/:input(*)', function(req, res){
     // Regex from https://gist.github.com/dperini/729294
     var regex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i;
-    if(!regex.test(req.params.input)) {
+    if(!regex.test(req.params.input) && req.params.input.length !== 4) {
         console.log("not a valid url");
         res.json({invalid: "Not a valid url"});
         return;
-    
     }
     
+    
+    
     MongoClient.connect(url, function(err, db) {
+      
        if(err) console.log(err);
-        db.collection('urlStorage').findOne({"id": req.params.input}, function(err, doc) {
+       if(req.params.input.length === 4) {
+           db.collection('urlStorage').findOne({"id": Number(req.params.input)}, function(err, doc) {
+               if(err) {
+                   console.log(err);
+                   res.json({url: "URL doesn't exist."});
+                   db.close();
+                   return;
+               } else {
+                   if(doc===null) {
+                       db.close();
+                       res.json({search_error: "URL doesn't exist."});
+                       return;
+                   }
+                res.redirect(doc.url);
+               }
+           });
+           db.close();
+          return;
+       }
+        db.collection('urlStorage').findOne({"url": req.params.input}, function(err, doc) {
+            if(err)  {
+                console.log(err);
+                res.json({database_error: "Please try again."});
+            }
+            
         if (doc) {
             console.log("already exists!");
          //res.json({url: "localhost/" + doc.id, old: req.params.input});
@@ -73,13 +91,12 @@ router.get('/:input', function(req, res){
            });
         }
         });
-       //else {
-           
-           
-       //}
+      
     });
     
+    
 });
+
 
 
 
