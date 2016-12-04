@@ -15,10 +15,6 @@ router.set('view engine', 'pug');
 router.set('views', path.join(__dirname, 'views'));
 
 
-//-------------------------Database Stuff
-//var url = `${MONGODB_URI}`;
-
-
 //------------------------------Middleware
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
@@ -40,10 +36,7 @@ router.get('/:input(*)', function(req, res){
         return;
     }
     
-    
-    
     MongoClient.connect(MONGODB_URI, function(err, db) {
-      
        if(err) console.log(err);
        if(req.params.input.length === 4) {
            db.collection('urlStorage').findOne({"id": Number(req.params.input)}, function(err, doc) {
