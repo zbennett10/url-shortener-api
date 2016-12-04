@@ -9,14 +9,14 @@ var pug = require('pug');
 var MongoClient = mongo.MongoClient;
 var db = mongo.Database
 var router = express();
-var MONGODB_URI = process.env.MONGOLAB_URI
+var MONGODB_URI = process.env.MONGOLAB_URI;
 
 router.set('view engine', 'pug');
 router.set('views', path.join(__dirname, 'views'));
 
 
 //-------------------------Database Stuff
-var url = `${MONGODB_URI}`;
+//var url = `${MONGODB_URI}`;
 
 
 //------------------------------Middleware
@@ -42,7 +42,7 @@ router.get('/:input(*)', function(req, res){
     
     
     
-    MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(MONGODB_URI, function(err, db) {
       
        if(err) console.log(err);
        if(req.params.input.length === 4) {
