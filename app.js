@@ -9,7 +9,7 @@ var pug = require('pug');
 var MongoClient = mongo.MongoClient;
 var db = mongo.Database
 var router = express();
-var server = http.createServer(router);
+
 router.set('view engine', 'pug');
 router.set('views', path.join(__dirname, 'views'));
 
