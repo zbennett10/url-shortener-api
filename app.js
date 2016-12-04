@@ -89,6 +89,4 @@ router.get('/:input(*)', function(req, res){
     
 });
 
-function
-
 module.exports = router;
