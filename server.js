@@ -16,7 +16,7 @@ router.set('views', path.join(__dirname, 'views'));
 
 
 //-------------------------Database Stuff
-var url = `mongodb://${process.env.IP}:27017/local`;
+var url = `${MONGODB_URI}`;
 
 
 //------------------------------Middleware
