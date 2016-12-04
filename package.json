@@ -1,9 +1,15 @@
 {
   "name": "url-shortener",
   "version": "1.0.0",
+  "engines": {
+    "node": "6.9.1",
+    "npm": "3.10.8"
+  },
   "description": "A url-shortener microservice",
-  "start": "node .bin/www",
-  "main": "server.js",
+  "main": "view.pug",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
   "repository": "",
   "author": "Zachary Bennett zbennett10@hotmail.com",
   "dependencies": {
