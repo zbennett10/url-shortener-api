@@ -9,6 +9,7 @@ var pug = require('pug');
 var MongoClient = mongo.MongoClient;
 var db = mongo.Database
 var router = express();
+var MONGODB_URI = process.env.MONGOLAB_URI
 
 router.set('view engine', 'pug');
 router.set('views', path.join(__dirname, 'views'));
