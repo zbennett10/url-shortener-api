@@ -74,7 +74,6 @@ router.get('/:input(*)', function(req, res){
            var collection = db.collection('urlStorage');
            var url = {id: Math.floor(Math.random()*(10000-1000+1)+1000) , url: req.params.input};
            collection.insert(url, function(err,result) {
-               
                if(err) console.log(err);
                else {
                    res.json({url: "https://url-shortener-zbennett10.c9users.io/" + result.ops[0].id.toString(), old: req.params.input});
@@ -90,6 +89,6 @@ router.get('/:input(*)', function(req, res){
     
 });
 
-
+function
 
 module.exports = router;
