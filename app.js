@@ -69,7 +69,7 @@ router.get('/:input(*)', function(req, res){
             console.log("already exists!");
          //res.json({url: "localhost/" + doc.id, old: req.params.input});o
          //return json of existing doc showing that websites tiny url
-         return res.redirect(doc.url);
+         return res.json(doc);
 
         }
         else {
