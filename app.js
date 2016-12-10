@@ -44,7 +44,7 @@ router.get('/:input(*)', function(req, res){
       
        if(req.params.input.length === 4) { //if query is assumed to be within database
            collection.findOne({"id": Number(req.params.input)}, function(err, doc) {
-               findExistingUrl(err, doc, res);
+               findExistingUrl(err, doc, res, db);
            });
            db.close();
           return;
@@ -75,7 +75,7 @@ router.get('/:input(*)', function(req, res){
 });
 
 //redirects the user to the existing url
-function findExistingUrl(err, document, response) {
+function findExistingUrl(err, document, response, db) {
     if(err || document===null) { //error with seaching database
         console.log(err);
         response.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."}); 
