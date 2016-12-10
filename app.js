@@ -28,7 +28,7 @@ router.get(('/'),function(req,res) {
 
 //route for url query
 router.get('/:input(*)', function(req, res){
-    validteRequest(req, res); //validate url
+    validateRequest(req, res); //validate url
     
     MongoClient.connect(MONGODB_URI, function(err, db) {  //database connection
        if(err) dbErrorHandle(error, res);
