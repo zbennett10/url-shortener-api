@@ -37,6 +37,7 @@ router.get('/:input(*)', function(req, res){
         return;
     }
     
+    //bug when inputting an invalid url and when inputting a 4-number sequene that is not within the db
     MongoClient.connect(MONGODB_URI, function(err, db) {  //database connection
     var collection = db.collection('urlStorage');
        if(err) dbErrorHandle(error, res);
@@ -77,7 +78,7 @@ router.get('/:input(*)', function(req, res){
 function findExistingUrl(err, document, response) {
     if(err || document===null) { //error with seaching database
         console.log(err);
-        res.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."}); 
+        response.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."}); 
         db.close();
         return;
     } 
