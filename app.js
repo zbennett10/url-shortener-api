@@ -33,47 +33,35 @@ router.get('/:input(*)', function(req, res){
 
     if(!regex.test(req.params.input) && req.params.input.length !== 4) { //if query isn't a url or is not a 4 number sequence
         console.log("not a valid url");
-        res.json({invalid: "Not a valid url"});
+        res.json({request_error: "Invalid url. Please refine your request."});
         return;
     }
     
     MongoClient.connect(MONGODB_URI, function(err, db) {  //database connection
-       if(err) { //if there is an error connection to database
-        console.log(err);
-        res.json({database_error: "There was an error processing your request. Please try again."});
-       }
+    var collection = db.collection('urlStorage');
+       if(err) dbErrorHandle(error, res);
       
        if(req.params.input.length === 4) { //if query is assumed to be within database
-           db.collection('urlStorage').findOne({"id": Number(req.params.input)}, function(err, doc) {
+           collection.findOne({"id": Number(req.params.input)}, function(err, doc) {
                findExistingUrl(err, doc, res);
            });
            db.close();
           return;
        }
 
-        db.collection('urlStorage').findOne({"url": req.params.input}, function(err, doc) {
-            if(err)  {
-                console.log(err);
-                res.json({database_error: "Please try again."});
-            }
-            
+        collection.findOne({"url": req.params.input}, function(err, doc) {
+            if(err) dbErrorHandle(err, res);
+        
         if (doc) {
-            console.log("already exists!");
-         //res.json({url: "localhost/" + doc.id, old: req.params.input});
-
-         //take out document id (_id) of json document response;
+            console.log("Request for an existing url has been made.");
          return res.json({url: "https://bennett-url-shortener.herokuapp.com/" + doc.id.toString(), old: req.params.input});
-
-        }
-        else {
-            console.log("doesn't exist!");
-           var collection = db.collection('urlStorage');
+        } else {
+            console.log("Generating new url.....");
            var url = {id: Math.floor(Math.random()*(10000-1000+1)+1000) , url: req.params.input};
            collection.insert(url, function(err,result) {
-               if(err) console.log(err);
+               if(err) dbErrorHandle(err, res);
                else {
                    res.json({url: "https://bennett-url-shortener.herokuapp.com/" + result.ops[0].id.toString(), old: req.params.input});
-                   console.log(result);
                    db.close();
                }
            });
@@ -85,14 +73,20 @@ router.get('/:input(*)', function(req, res){
     
 });
 
+//redirects the user to the existing url
 function findExistingUrl(err, document, response) {
     if(err || document===null) { //error with seaching database
-                   console.log(err);
-                   res.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."});
-                   db.close();
-                   return;
-               } 
-                response.redirect(document.url);
+        console.log(err);
+        res.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."}); 
+        db.close();
+        return;
+    } 
+    response.redirect(document.url); //redirection to url
+}
+
+function dbErrorHandle(error, response) {
+    console.log(error);
+    response.json({database_error: "There was an error processing your request. Please try again."});
 }
 
 module.exports = router;
