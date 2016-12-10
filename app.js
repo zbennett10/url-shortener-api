@@ -37,37 +37,36 @@ router.get('/:input(*)', function(req, res){
         return;
     }
     
-    //bug when inputting an invalid url and when inputting a 4-number sequene that is not within the db
+    //open database and get responses
     MongoClient.connect(MONGODB_URI, function(err, db) {  //database connection
-    var collection = db.collection('urlStorage');
        if(err) dbErrorHandle(error, res);
-       if(findExistingUrl(res, req, db)) return;
-      
-        collection.findOne({"url": req.params.input}, function(err, doc) {
-            if(err) dbErrorHandle(err, res);
+       else if(findExistingUrl(res, req, db)) return;
+       else createNewUrl(res, req, db);
+    });
+});
+
+//generates a new url
+function createNewUrl(response, request, db) {
+    var collection = db.collection('urlStorage');
+    collection.findOne({"url": req.params.input}, function(err, doc) {
+        if(err) dbErrorHandle(err, response);
         
         if (doc) {
-            console.log("Request for an existing url has been made.");
-         return res.json({url: "https://bennett-url-shortener.herokuapp.com/" + doc.id.toString(), old: req.params.input});
+         console.log("Request for an existing url has been made.");
+         return response.json({url: "https://bennett-url-shortener.herokuapp.com/" + doc.id.toString(), old: request.params.input});
         } else {
-            console.log("Generating new url.....");
-           var url = {id: Math.floor(Math.random()*(10000-1000+1)+1000) , url: req.params.input};
+           console.log("Generating new url.....");
+           var url = {id: Math.floor(Math.random()*(10000-1000+1)+1000) , url: request.params.input};
            collection.insert(url, function(err,result) {
-               if(err) dbErrorHandle(err, res);
+               if(err) dbErrorHandle(err, response);
                else {
-                   res.json({url: "https://bennett-url-shortener.herokuapp.com/" + result.ops[0].id.toString(), old: req.params.input});
+                   response.json({url: "https://bennett-url-shortener.herokuapp.com/" + result.ops[0].id.toString(), old: request.params.input});
                    db.close();
                }
            });
         }
-        });
-      
     });
-    
-    
-});
-
-//if the user is trying to redirect to an existing url
+}
 
 
 //redirects the user to the existing url
