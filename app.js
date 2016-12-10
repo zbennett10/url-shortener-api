@@ -46,18 +46,10 @@ router.get('/:input(*)', function(req, res){
        if(req.params.input.length === 4) { //if query is assumed to be within database
            db.collection('urlStorage').findOne({"id": Number(req.params.input)}, function(err, doc) {
                findExistingUrl(err, doc, res);
-            //    if(err || doc===null) { //error with seaching database
-            //        console.log(err);
-            //        res.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."});
-            //        db.close();
-            //        return;
-            //    } 
-            //     res.redirect(doc.url);
            });
            db.close();
           return;
        }
-
 
         db.collection('urlStorage').findOne({"url": req.params.input}, function(err, doc) {
             if(err)  {
@@ -67,9 +59,10 @@ router.get('/:input(*)', function(req, res){
             
         if (doc) {
             console.log("already exists!");
-         //res.json({url: "localhost/" + doc.id, old: req.params.input});o
-         //return json of existing doc showing that websites tiny url
-         return res.json(doc);
+         //res.json({url: "localhost/" + doc.id, old: req.params.input});
+
+         //take out document id (_id) of json document response;
+         return res.json({url: "https://bennett-url-shortener.herokuapp.com/" + doc.id.toString(), old: req.params.input});
 
         }
         else {
@@ -79,7 +72,7 @@ router.get('/:input(*)', function(req, res){
            collection.insert(url, function(err,result) {
                if(err) console.log(err);
                else {
-                   res.json({url: "https://url-shortener-zbennett10.c9users.io/" + result.ops[0].id.toString(), old: req.params.input});
+                   res.json({url: "https://bennett-url-shortener.herokuapp.com/" + result.ops[0].id.toString(), old: req.params.input});
                    console.log(result);
                    db.close();
                }
