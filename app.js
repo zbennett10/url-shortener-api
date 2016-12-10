@@ -41,7 +41,7 @@ router.get('/:input(*)', function(req, res){
     MongoClient.connect(MONGODB_URI, function(err, db) {  //database connection
     var collection = db.collection('urlStorage');
        if(err) dbErrorHandle(error, res);
-       findExistingUrl(err, res, req, db);
+       if(findExistingUrl(res, req, db)) return;
       
         collection.findOne({"url": req.params.input}, function(err, doc) {
             if(err) dbErrorHandle(err, res);
@@ -71,7 +71,7 @@ router.get('/:input(*)', function(req, res){
 
 
 //redirects the user to the existing url
-function findExistingUrl(err, response, request, db) {
+function findExistingUrl(response, request, db) {
     var collection = db.collection('urlStorage');
     if(request.params.input.length === 4) { //if query is assumed to be within database
            collection.findOne({"id": Number(request.params.input)}, function(err, document) {
@@ -79,12 +79,12 @@ function findExistingUrl(err, response, request, db) {
                     console.log(err);
                     response.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."}); 
                     db.close();
-                    return;
+                    return true;
                 } 
             response.redirect(document.url); //redirection to url
-           });
+    });
     db.close();
-    return;
+    return true;
     }   
 }
 
