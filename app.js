@@ -41,15 +41,8 @@ router.get('/:input(*)', function(req, res){
     MongoClient.connect(MONGODB_URI, function(err, db) {  //database connection
     var collection = db.collection('urlStorage');
        if(err) dbErrorHandle(error, res);
+       findExistingUrl(err,res, db);
       
-       if(req.params.input.length === 4) { //if query is assumed to be within database
-           collection.findOne({"id": Number(req.params.input)}, function(err, doc) {
-               findExistingUrl(err, doc, res, db);
-           });
-           db.close();
-          return;
-       }
-
         collection.findOne({"url": req.params.input}, function(err, doc) {
             if(err) dbErrorHandle(err, res);
         
@@ -74,17 +67,28 @@ router.get('/:input(*)', function(req, res){
     
 });
 
+//if the user is trying to redirect to an existing url
+
+
 //redirects the user to the existing url
-function findExistingUrl(err, document, response, db) {
-    if(err || document===null) { //error with seaching database
-        console.log(err);
-        response.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."}); 
-        db.close();
-        return;
-    } 
-    response.redirect(document.url); //redirection to url
+function findExistingUrl(err, response, db) {
+    var collection = db.collection('urlStorage');
+    if(req.params.input.length === 4) { //if query is assumed to be within database
+           collection.findOne({"id": Number(req.params.input)}, function(err, document) {
+               if(err || document===null) { //error with seaching database
+                    console.log(err);
+                    response.json({database_error: "The supposed URL doesn't exist or there was a problem searching the database."}); 
+                    db.close();
+                    return;
+                } 
+            response.redirect(document.url); //redirection to url
+           });
+    db.close();
+    return;
+    }   
 }
 
+//database error handler
 function dbErrorHandle(error, response) {
     console.log(error);
     response.json({database_error: "There was an error processing your request. Please try again."});
