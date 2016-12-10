@@ -50,7 +50,7 @@ function validateRequest(request, response) {
 //generates a new url
 function createNewUrl(response, request, db) {
     var collection = db.collection('urlStorage');
-    collection.findOne({"url": req.params.input}, function(err, doc) {
+    collection.findOne({"url": request.params.input}, function(err, doc) {
         if(err) dbErrorHandle(err, response);
         
         if (doc) {
